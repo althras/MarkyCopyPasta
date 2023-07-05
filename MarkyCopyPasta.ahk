@@ -1,6 +1,14 @@
 #Requires AutoHotkey v2.0
 SetTitleMatchMode 2
 
+A_TrayMenu.Add()  ; Creates a separator line.
+A_TrayMenu.Add("Instructions/Help", MenuHandler)  ; Creates a new menu item.
+
+MenuHandler(ItemName, ItemPos, MyMenu) {
+	WelcomeMessage()
+}
+
+; Fire the welcome message on first load.
 WelcomeMessage()
 
 !NumpadDiv:: Reload
