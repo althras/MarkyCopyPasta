@@ -25,7 +25,7 @@ WelcomeMessage() {
 		Ctrl+; - Compare the Student ID list in Excel column and CaMSys (any) page`r`n`r`n
 		While this script is running, a green 'H' icon will be in your system tray. This program copies a vertical column of marks from Excel into the coursework marks entry page in CaMSys.`r`n`r`n
 		How to use:`r`n
-		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. Make sure there is nothing in the cell below the last mark. Any students with no marks should be given a zero. For Exam Marks Entry, copy the special grades (W, R) from CaMSys marks entry page into the cell for the student's mark.`r`n
+		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. Make sure there is nothing in the cell below the last mark. Any students with no marks should be given a zero. For Exam Marks Entry, copy the special grades (W, R, U, I) from CaMSys marks entry page into the cell for the student's mark.`r`n
 		(2) Open Chrome, log into CaMSys and navigate to the Coursework Marks Entry page for your subject. Click on the component required, and place your cursor inside the box for the first student's mark.`r`n
 		(3) Press Ctrl+[ for CW Marks Entry or Ctrl+] for CW Sub Component Marks Entry Page or Ctrl+/ for Exam Marks Entry Page. Do not touch the keyboard while the script runs.`r`n
 		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CaMSys respectively.`r`n`r`n
@@ -34,7 +34,7 @@ WelcomeMessage() {
 		(2) Open Chrome, log into CaMSys and navigate to the Coursework Marks Entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). Do not touch the keyboard while the script runs.`r`n`r`n
 		Press Alt+Q to Quit the script, or right-click the 'H' icon in your system tray and click Exit.`r`n`r`n
-		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.2 (Beta Test)
+		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.21 (Beta Test)
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!"
@@ -45,7 +45,7 @@ CopyExcelColumnToCaMSys(Option) {
 	Marks := CopyExcelColumn()
 
 	if !Marks {
-		MsgBox "Failed to copy only marks/grades (numbers, R, W) from Excel."
+		MsgBox "Failed to copy only marks/grades (numbers, R, W, U, I) from Excel."
 		return false
 	}
 
@@ -132,7 +132,7 @@ CopyExcelColumn() {
 	Sleep 30
 
 	for mark in Marks
-		if !IsNumber(mark) and mark != "R" and mark != "W"
+		if !IsNumber(mark) and mark != "R" and mark != "W" and mark != "I" and mark != "U"
 			return false
 
 	return Marks
@@ -267,7 +267,6 @@ SwitchToExcelWindow() {
 			}
 			else {
 				MsgBox("Too many Excel files open. Please open only the Excel file containing your student marks.")
-				; ECHO please make sure only one Excel window is open.
 				return false
 			}
 		}
