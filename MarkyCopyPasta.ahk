@@ -34,7 +34,7 @@ WelcomeMessage() {
 		(2) Open Chrome, log into CaMSys and navigate to the Coursework Marks Entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). Do not touch the keyboard while the script runs.`r`n`r`n
 		Press Alt+Q to Quit the script, or right-click the 'H' icon in your system tray and click Exit.`r`n`r`n
-		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.21 (Beta Test)
+		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.2.1 (Beta Test)
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!"
