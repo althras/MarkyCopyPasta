@@ -14,4 +14,4 @@ This program can also check if the order of Student IDs in Excel and CaMSys matc
 
 Press Alt+Q to Quit the script, or right-click the 'H' icon in your system tray and click Exit.
 
-This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.2 (Beta Test)
+This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.2.1 (Beta Test)
