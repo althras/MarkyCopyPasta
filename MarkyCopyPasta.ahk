@@ -27,23 +27,23 @@ WelcomeMessage() {
 	welcomemsg := "
 	(
 		Shortcuts (works from anywhere until you quit):`r`n
-		Ctrl + [ - Copy for CW Marks Entry or Exam Marks Entry page`r
+		Ctrl + [ - Copy for CW/Exam/OBE Exam Marks Entry pages`r
 		Ctrl + ] - Copy for CW Marks Sub Component Entry page`r
-		Ctrl + ; - Compare the Student ID list in Excel column and CaMSys (any) page`r
+		Ctrl + ; - Compare Student ID in Excel and CaMSys`r
 		Alt + q - Quit the program`r
 		Alt + h - See this help message`r`n`r`n
-		While this script is running, a green 'H' icon will be in your system tray. This program copies a vertical column of marks from Excel into the coursework marks entry page in CaMSys.`r`n`r`n
+		While this script is running, a white & blue 'S' icon will be in your system tray. This program copies a vertical column of marks from Excel into the coursework marks entry page in CaMSys.`r`n`r`n
 		How to use:`r`n
-		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. Make sure there is nothing in the cell below the last mark. Any students with no marks should be given a zero. For Exam Marks Entry, copy the special grades (W, R, U, I) from CaMSys marks entry page into the cell for the student's mark.`r`n
-		(2) Open Chrome, log into CaMSys and navigate to the Coursework Marks Entry page for your subject. Click on the component required, and place your cursor inside the box for the first student's mark.`r`n
-		(3) Press Ctrl+[ for CW Marks Entry / Exam Marks Entry page or Press Ctrl+] for CW Marks Sub Component Entry Page. Do not touch the keyboard while the script runs.`r`n
-		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CaMSys respectively.`r`n`r`n
+		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. Make sure there is nothing in the cell below the last mark. Any students with no marks should be given a zero. For Exam Marks Entry and OBE Exam Mark Entry(w/Breakup), copy the special grades (W, R, U, I) from CaMSys marks entry page into the cell for the student's mark.`r`n
+		(2) Open Chrome, log into CaMSys and navigate to the relevant marks entry page for your subject. Click on the component required, and place your cursor inside the box for the first student's mark.`r`n
+		(3) Press Ctrl+[ for CW/Exam/OBE Exam Marks Entry or Press Ctrl+] for CW Marks Sub Component Entry Page. Do not touch the keyboard while the script runs.`r`n
+		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CaMSys respectively. If you experience errors, you can try again without refreshing the page. This program does not click the save or submit buttons. You should be safe from errors, but remember to save your work.`r`n`r`n
 		This program can also check if the order of Student IDs in Excel and CaMSys matches:`r`n
 		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of Student IDs (on the first student's ID).`r`n
-		(2) Open Chrome, log into CaMSys and navigate to the Coursework Marks Entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
+		(2) Open Chrome, log into CaMSys and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). Do not touch the keyboard while the script runs.`r`n`r`n
 		Press Alt+Q to Quit the script, or right-click the 'H' icon in your system tray and click Exit.`r`n`r`n
-		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.3 (Beta Test).
+		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.3.1 (Beta Release).
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!"
@@ -153,14 +153,23 @@ PasteColumnInCaMSys(Marks, Option) {
 	if !SwitchToCaMSysWindow()
 		Exit
 
-	; Perform check - make sure it's in data entry mode
+	Sleep 500
+
+	; Perform check - make sure it's in data entry mode - input fields usually have 0.00 inside to start with
 	A_Clipboard := "xyzblah"
 	Sleep 60
 	Send "^a"
 	Sleep 100  
 	Send "^c"
-	Sleep 30
-	if !IsNumber(A_Clipboard) {
+	Sleep 250
+
+	; Input fields usually have 0.00 inside to start with
+	if !IsNumber(A_Clipboard) and !WinActive("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe") {
+		MsgBox "Cursor is not in input field. Please click / place the cursor into the first marks entry field."
+		Exit
+	}
+	; Account for OBE Exam Mark Entry(w/Breakup) page which is blank to start with, or may contain numbers (on other than 1st attempt)
+	else if (A_Clipboard != "xyzblah") and !IsNumber(A_Clipboard) and WinActive("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe") {
 		MsgBox "Cursor is not in input field. Please click / place the cursor into the first marks entry field."
 		Exit
 	}
@@ -306,7 +315,8 @@ SwitchToCaMSysWindow() {
 		!WinExist("CW Marks Entry - Google Chrome ahk_exe chrome.exe") and
 		!WinExist("Sub Component Data Entry - Google Chrome ahk_exe chrome.exe") and 
 		!WinExist("Exam Marks Entry - Google Chrome ahk_exe chrome.exe") and
-		!WinExist("Exam Marks - Google Chrome ahk_exe chrome.exe")
+		!WinExist("Exam Marks - Google Chrome ahk_exe chrome.exe") and
+		!WinExist("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe")
 		) {
 		MsgBox("Your Google Chrome is not opened to the Coursework Marks entry page. Please open Google Chrome to the correct page and place the cursor on the first value of the column of marks you wish to copy to.")
 		return false
@@ -322,6 +332,8 @@ SwitchToCaMSysWindow() {
 			WinActivate("Exam Marks Entry - Google Chrome ahk_exe chrome.exe")
 		else if WinExist("Exam Marks - Google Chrome ahk_exe chrome.exe")
 			WinActivate("Exam Marks - Google Chrome ahk_exe chrome.exe")
+		else if WinExist("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe")
+			WinActivate("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe")
 	}
 	Sleep 60
 	return true
