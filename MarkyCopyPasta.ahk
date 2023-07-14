@@ -20,7 +20,7 @@ WelcomeMessage()
 !q:: ExitApp
 
 ; Test settings
-; !w:: MsgBox("Student ID lists do not match! Mismatch found at position number " 1, "Mismatch", "Iconi")
+; !w:: MsgBox "Student ID lists do not match! Mismatch found at position number " 1, "Mismatch", "iconx"
 ; Test settings end
 
 WelcomeMessage() {
@@ -46,7 +46,7 @@ WelcomeMessage() {
 		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.3.2 (Beta Release).
 	)"
 
-	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!"
+	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
 }
 
 CopyExcelColumnToCaMSys(Option) {
@@ -54,7 +54,7 @@ CopyExcelColumnToCaMSys(Option) {
 	Marks := CopyExcelColumn()
 
 	if !Marks {
-		MsgBox "Failed to copy only marks/grades (numbers, R, W, U, I) from Excel."
+		MsgBox "Failed to copy only marks/grades (numbers, R, W, U, I) from Excel.",, "iconx"
 		return false
 	}
 
@@ -66,14 +66,14 @@ CheckStudentIDOrder() {
 	ExcelStudentIDs := GetStudentIDExcel()
 
 	if !ExcelStudentIDs {
-		MsgBox "Failed to copy only Student IDs (numbers) from Excel."
+		MsgBox "Failed to copy only Student IDs (numbers) from Excel.",, "iconx"
 		return false
 	}
 
 	CaMSysStudentIDs := GetStudentIDCaMSys()
 
 	if CaMSysStudentIDs.Length < 1 {
-		MsgBox "Failed to copy Student IDs from CaMSys page."
+		MsgBox "Failed to copy Student IDs from CaMSys page.",, "iconx"
 		return false
 	}
 
@@ -91,25 +91,25 @@ CheckStudentIDOrder() {
 		if CaMSysStudentIDs.Has(index) {
 			if esid != CaMSysStudentIDs[index] {
 				if !longer {
-					MsgBox("Student ID lists do not match! Mismatch found at position number " index, "Mismatch", "Iconx")
+					MsgBox "Student ID lists do not match! Mismatch found at position number " index, "Mismatch", "iconx"
 					Exit
 				}
 				else {
-					MsgBox("Student ID lists do not match! Mismatch found at position number " index ". " longer, "Mismatch", "Iconx")
+					MsgBox "Student ID lists do not match! Mismatch found at position number " index ". " longer, "Mismatch", "iconx"
 					Exit
 				}
 			}
 		}
 		else {
-			MsgBox("Student ID lists do not match! Mismatch found at position number " index ". " longer, "Mismatch", "Iconx")
+			MsgBox "Student ID lists do not match! Mismatch found at position number " index ". " longer, "Mismatch", "iconx"
 			Exit
 		}
 	}
 
 	if !longer
-		MsgBox("Student ID lists match!", "Match!", "Iconi")
+		MsgBox "Student ID lists match!", "Match!", "iconi"
 	else
-		MsgBox("Student ID lists do not match! " longer, "Mismatch", "Iconx")
+		MsgBox "Student ID lists do not match! " longer, "Mismatch", "iconx"
 }
 
 CopyExcelColumn() {
@@ -165,12 +165,12 @@ PasteColumnInCaMSys(Marks, Option) {
 
 	; Input fields usually have 0.00 inside to start with
 	if !IsNumber(A_Clipboard) and !WinActive("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe") {
-		MsgBox "Cursor is not in input field. Please click / place the cursor into the first marks entry field."
+		MsgBox "Cursor is not in input field. Please click / place the cursor into the first marks entry field.",, "iconx"
 		Exit
 	}
 	; Account for OBE Exam Mark Entry(w/Breakup) page which is blank to start with, or may contain numbers (on other than 1st attempt)
 	else if (A_Clipboard != "xyzblah") and !IsNumber(A_Clipboard) and WinActive("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe") {
-		MsgBox "Cursor is not in input field. Please click / place the cursor into the first marks entry field."
+		MsgBox "Cursor is not in input field. Please click / place the cursor into the first marks entry field.",, "iconx"
 		Exit
 	}
 
@@ -182,7 +182,7 @@ PasteColumnInCaMSys(Marks, Option) {
 				if Marks[3] == 0 {
 					Send "{Tab}"
 					if Marks[4] ==0 {
-						MsgBox "Detected that your first four marks are ZEROES (0). When there are more than three ZEROES (O) at the top of your marks table, please enter them manually and start your cursor in Excel and CaMSys from the first non-zero mark."
+						MsgBox "Detected that your first four marks are ZEROES (0). When there are more than three ZEROES (O) at the top of your marks table, please enter them manually and start your cursor in Excel and CaMSys from the first non-zero mark.",, "iconx"
 						Exit
 					}
 					Send Marks[4]
@@ -210,7 +210,7 @@ PasteColumnInCaMSys(Marks, Option) {
 		}
 	}
 	Sleep 15000
-	MsgBox "Finished copying marks from Excel to CaMSys! Please wait for the CaMSys page to finish 'spinning.' Remember to check marks entered and click 'Save' once confirmed.`r`n`r`nIf you have entered zero marks, when you save or switch columns, you may have to click 'Ok' multiple times. This is normal.`r`n`r`nFor Exam Marks Entry Page, with a large number of students, copying may fail the first time. Please attempt marks copying a second time without refreshing the page. This usually solves the problem."
+	MsgBox "Finished copying marks from Excel to CaMSys! Please wait for the CaMSys page to finish 'spinning.' Remember to check marks entered and click 'Save' once confirmed.`r`n`r`nIf you have entered zero marks, when you save or switch columns, you may have to click 'Ok' multiple times. This is normal.`r`n`r`nFor Exam Marks Entry Page, with a large number of students, copying may fail the first time. Please attempt marks copying a second time without refreshing the page. This usually solves the problem.",, "iconi"
 }
 
 GetStudentIDExcel() {
@@ -264,7 +264,7 @@ GetStudentIDCaMSys() {
 	Send "^c"
 	Sleep 1000
 	if A_Clipboard == "xyzblah" {
-		MsgBox "Failed to get Student IDs from page."
+		MsgBox "Failed to get Student IDs from page.",, "iconx"
 		Exit
 	}
 
@@ -287,12 +287,12 @@ SwitchToExcelWindow() {
 				WinActivate("ahk_class XLMAIN")
 			}
 			else {
-				MsgBox("Too many Excel files open. Please open only the Excel file containing your student marks.")
+				MsgBox "Too many Excel files open. Please open only the Excel file containing your student marks.",, "iconx"
 				return false
 			}
 		}
 		else {
-			MsgBox("No Excel file currently open. Please open an Excel file containing your student marks.")
+			MsgBox "No Excel file currently open. Please open an Excel file containing your student marks.",, "iconx"
 			return false
 		}
 	}
@@ -318,7 +318,7 @@ SwitchToCaMSysWindow() {
 		!WinExist("Exam Marks - Google Chrome ahk_exe chrome.exe") and
 		!WinExist("OBE Exam Mark Entry(w/Breakup) - Google Chrome ahk_exe chrome.exe")
 		) {
-		MsgBox("Your Google Chrome is not opened to the Coursework Marks entry page. Please open Google Chrome to the correct page and place the cursor on the first value of the column of marks you wish to copy to.")
+		MsgBox "Your Google Chrome is not opened to a marks entry page. Please open Google Chrome to the correct page and place the cursor on the first value of the column of marks you wish to copy to.",, "iconx"
 		return false
 	}
 	else {
