@@ -20,7 +20,7 @@ WelcomeMessage()
 !q:: ExitApp
 
 ; Test settings
-; !w:: MsgBox A_Clipboard
+; !w:: MsgBox("Student ID lists do not match! Mismatch found at position number " 1, "Mismatch", "Iconi")
 ; Test settings end
 
 WelcomeMessage() {
@@ -43,7 +43,7 @@ WelcomeMessage() {
 		(2) Open Chrome, log into CaMSys and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). Do not touch the keyboard while the script runs.`r`n`r`n
 		Press Alt+Q to Quit the script, or right-click the 'H' icon in your system tray and click Exit.`r`n`r`n
-		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.3.1 (Beta Release).
+		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.3.2 (Beta Release).
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!"
@@ -91,25 +91,25 @@ CheckStudentIDOrder() {
 		if CaMSysStudentIDs.Has(index) {
 			if esid != CaMSysStudentIDs[index] {
 				if !longer {
-					MsgBox "Student ID lists do not match! Mismatch found at position number " index
+					MsgBox("Student ID lists do not match! Mismatch found at position number " index, "Mismatch", "Iconx")
 					Exit
 				}
 				else {
-					MsgBox "Student ID lists do not match! Mismatch found at position number " index ". " longer
+					MsgBox("Student ID lists do not match! Mismatch found at position number " index ". " longer, "Mismatch", "Iconx")
 					Exit
 				}
 			}
 		}
 		else {
-			MsgBox "Student ID lists do not match! Mismatch found at position number " index ". " longer
+			MsgBox("Student ID lists do not match! Mismatch found at position number " index ". " longer, "Mismatch", "Iconx")
 			Exit
 		}
 	}
 
 	if !longer
-		MsgBox "Student ID lists match!"
+		MsgBox("Student ID lists match!", "Match!", "Iconi")
 	else
-		MsgBox "Student ID lists do not match! " longer
+		MsgBox("Student ID lists do not match! " longer, "Mismatch", "Iconx")
 }
 
 CopyExcelColumn() {
