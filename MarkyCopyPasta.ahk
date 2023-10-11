@@ -15,6 +15,8 @@ WelcomeMessage()
 
 ^[:: CopyExcelColumnToCaMSys("Others")
 ^]:: CopyExcelColumnToCaMSys("CWSub")
+^\:: CopyExcelColumnToCaMSys("FinalOBE")
+; ^\:: CopyExcelColumn("FinalOBE")
 ^;:: CheckStudentIDOrder()
 !h:: WelcomeMessage()
 !q:: ExitApp
@@ -27,38 +29,40 @@ WelcomeMessage() {
 	welcomemsg := "
 	(
 		Shortcuts (works from anywhere until you quit):`r`n
-		Ctrl + [ - Copy for CW/Exam/OBE Exam Marks Entry pages`r
+		Ctrl + [ - Copy for CW/Exam Marks Entry pages`r
 		Ctrl + ] - Copy for CW Marks Sub Component Entry page`r
+		Ctrl + \ - Copy for OBE Exam Marks Entry (w/Breakup) page`r
 		Ctrl + ; - Compare Student ID in Excel and CaMSys`r
 		Alt + q - Quit the program`r
 		Alt + h - See this help message`r`n`r`n
 		While this script is running, a white & blue 'S' icon will be in your system tray. This program copies a vertical column of marks from Excel into the coursework marks entry page in CaMSys.`r`n`r`n
 		How to use:`r`n
-		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. Make sure there is nothing in the cell below the last mark. Any students with no marks should be given a zero. For Exam Marks Entry and OBE Exam Mark Entry(w/Breakup), copy the special grades (W, R, U, I) from CaMSys marks entry page into the cell for the student's mark.`r`n
+		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. For Exam Marks Entry (w/Breakup), when there are more than 2 components, select the first row of student marks instead (remember to exclude the last column which auto calculates in CaMSys).`r`n
+		Ensure there is nothing in the cell below the last mark. Students with no marks should be given a zero in Excel. For Exam Marks Entry and OBE Exam Mark Entry(w/Breakup), copy the special grades (W, R, U, I) from CaMSys marks entry page into the cell for the student's mark.`r`n
 		(2) Open Chrome, log into CaMSys and navigate to the relevant marks entry page for your subject. Click on the component required, and place your cursor inside the box for the first student's mark.`r`n
-		(3) Press Ctrl+[ for CW/Exam/OBE Exam Marks Entry or Press Ctrl+] for CW Marks Sub Component Entry Page. Do not touch the keyboard while the script runs.`r`n
+		(3) Press Ctrl+[ for CW/Exam Marks Entry, Press Ctrl+] for CW Marks Sub Component Entry Page or Press Ctrl+\ for OBE Exam Marks Entry page. Do not touch the keyboard while the script runs.`r`n
 		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CaMSys respectively. If you experience errors, you can try again without refreshing the page. This program does not click the save or submit buttons. You should be safe from errors, but remember to save your work.`r`n`r`n
 		This program can also check if the order of Student IDs in Excel and CaMSys matches:`r`n
 		(1) Open the Excel file containing your marks and place the Excel cell cursor at the top of the column of Student IDs (on the first student's ID).`r`n
 		(2) Open Chrome, log into CaMSys and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). Do not touch the keyboard while the script runs.`r`n`r`n
 		Press Alt+Q to Quit the script, or right-click the 'H' icon in your system tray and click Exit.`r`n`r`n
-		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 0.3.2 (Beta Release).
+		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.0.
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
 }
 
-CopyExcelColumnToCaMSys(Option) {
+CopyExcelColumnToCaMSys(option) {
 	WaitNoAltKey()
-	Marks := CopyExcelColumn()
+	Marks := CopyExcelColumn(option)
 
 	if !Marks {
 		MsgBox "Failed to copy only marks/grades (numbers, R, W, U, I) from Excel.",, "iconx"
 		return false
 	}
 
-	PasteColumnInCaMSys(Marks, Option)
+	PasteColumnInCaMSys(Marks, option)
 }
 
 CheckStudentIDOrder() {
@@ -112,7 +116,7 @@ CheckStudentIDOrder() {
 		MsgBox "Student ID lists do not match! " longer, "Mismatch", "iconx"
 }
 
-CopyExcelColumn() {
+CopyExcelColumn(option) {
 	if !SwitchToExcelWindow()
 		Exit
 
@@ -121,6 +125,8 @@ CopyExcelColumn() {
 	A_Clipboard := "xyzblah"
 
 	; Copy contents of a cell to clipboard
+	Send "{Esc}"
+	Sleep 60
 	Send "^+{Down}"
 	Sleep 60
 	Send "^c"
@@ -135,20 +141,46 @@ CopyExcelColumn() {
 	Marks := StrSplit(A_Clipboard, "`r`n") ; Last item in this array is a blank
 	Marks.pop ; Remove the last blank element of the array
 
+	if(option=="FinalOBE") {
+		AllMarks := []
+		for RowMarks in Marks {
+			allmark := StrSplit(RowMarks, "`t") ; Last item in this array is a blank
+			AllMarks.push(allmark)
+		}
+		Marks := AllMarks
+	}
+
+	; if(option=="FinalOBE") {
+	; 	MsgBox Join2D(Marks)
+	; }
+	; else {
+	; 	MsgBox StrJoin(", ", Marks)
+	; }
+
 	Send "{Esc}"
 	Sleep 100
 	Send "{Right}"
 	Send "{Left}"
 	Sleep 100
 
-	for mark in Marks
-		if !IsNumber(mark) and mark != "R" and mark != "W" and mark != "I" and mark != "U"
-			return false
+	if(option!="FinalOBE") {
+		for mark in Marks
+			if !IsNumber(mark) and mark != "R" and mark != "W" and mark != "I" and mark != "U"
+				return false
+	}
+	else if(option=="FinalOBE") {
+		for RowMarks in Marks {
+			for mark in RowMarks {
+				if !IsNumber(mark) and mark != "R" and mark != "W" and mark != "I" and mark != "U"
+					return false
+			}
+		}
+	}
 
 	return Marks
 }
 
-PasteColumnInCaMSys(Marks, Option) {
+PasteColumnInCaMSys(Marks, option) {
 	WaitNoAltKey()
 	if !SwitchToCaMSysWindow()
 		Exit
@@ -174,41 +206,61 @@ PasteColumnInCaMSys(Marks, Option) {
 		Exit
 	}
 
-	For index, Mark in Marks {
-		if (index == 1) and (Mark == 0) {
-			Send "{Tab}"
-			if Marks[2] == 0 {
+	if(option!="FinalOBE") {
+		For index, Mark in Marks {
+			if (index == 1) and (Mark == 0) {
 				Send "{Tab}"
-				if Marks[3] == 0 {
+				if Marks[2] == 0 {
 					Send "{Tab}"
-					if Marks[4] ==0 {
-						MsgBox "Detected that your first four marks are ZEROES (0). When there are more than three ZEROES (O) at the top of your marks table, please enter them manually and start your cursor in Excel and CaMSys from the first non-zero mark.",, "iconx"
-						Exit
+					if Marks[3] == 0 {
+						Send "{Tab}"
+						if Marks[4] ==0 {
+							MsgBox "Detected that your first four marks are ZEROES (0). When there are more than three ZEROES (O) at the top of your marks table, please enter them manually and start your cursor in Excel and CaMSys from the first non-zero mark.",, "iconx"
+							Exit
+						}
+						Send Marks[4]
+						Send "+{Tab}"
 					}
-					Send Marks[4]
+					Send Marks[3]
 					Send "+{Tab}"
 				}
-				Send Marks[3]
+				Send Marks[2]
 				Send "+{Tab}"
-			}
-			Send Marks[2]
-			Send "+{Tab}"
-			Send Mark
-			Send "{Tab}"
-		}
-		else {
-			if IsNumber(Mark) {
 				Send Mark
 				Send "{Tab}"
 			}
+			else {
+				if IsNumber(Mark) {
+					Send Mark
+					Send "{Tab}"
+				}
 
-			; Account for weird CaMSys tabindex behavior jumping to page buttons with certain marks input fields
-			if (index == 261) and (Option=="Others") and ( WinActive("Course Work Marks - Google Chrome ahk_exe chrome.exe") or WinActive("CW Marks Entry - Google Chrome ahk_exe chrome.exe") )
-				Send "{Tab 2}"
-			else if (index == 191) and (Option=="CWSub")
-				Send "{Tab 4}"
+				; Account for weird CaMSys tabindex behavior jumping to page buttons with certain marks input fields
+				if (index == 261) and (option=="Others") and ( WinActive("Course Work Marks - Google Chrome ahk_exe chrome.exe") or WinActive("CW Marks Entry - Google Chrome ahk_exe chrome.exe") )
+					Send "{Tab 2}"
+				else if (index == 191) and (option=="CWSub")
+					Send "{Tab 4}"
+			}
 		}
 	}
+	else if(option=="FinalOBE") {
+
+		if( Marks[1][1] == 0 ) {
+			MsgBox "Detected that your first student's first mark is a ZERO (0). To avoid errors, please enter this manually and start your cursor in Excel and CaMSys from the first non-zero mark.",, "iconx"
+			Exit
+		}
+
+		For index, RowMarks in Marks {
+			for index2, Mark in RowMarks {
+				if IsNumber(Mark) {
+					Send Mark
+					Send "{Tab}"
+				}
+			}
+		}
+	}
+
+
 	Sleep 15000
 	MsgBox "Finished copying marks from Excel to CaMSys! Please wait for the CaMSys page to finish 'spinning.' Remember to check marks entered and click 'Save' once confirmed.`r`n`r`nIf you have entered zero marks, when you save or switch columns, you may have to click 'Ok' multiple times. This is normal.`r`n`r`nFor Exam Marks Entry Page, with a large number of students, copying may fail the first time. Please attempt marks copying a second time without refreshing the page. This usually solves the problem.",, "iconi"
 }
@@ -343,6 +395,13 @@ StrJoin(sep, params) {
 	for param in params
 		str .= param . sep
 	return SubStr(str, 1, -StrLen(sep))
+}
+
+Join2D( strArray2D ) {
+  s := ""
+  for i,array in strArray2D
+    s .= ", [" . StrJoin(", ", array) . "]"
+  return substr(s, 3)
 }
 
 WaitNoAltKey() {
