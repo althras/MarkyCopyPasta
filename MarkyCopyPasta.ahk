@@ -30,7 +30,7 @@ MenuHandler(ItemName, ItemPos, MyMenu) {
 Esc::ExitApp
 
 ; ########## SETTING UP GUI ##########
-MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.1")
+MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.2")
 MarkyCopyPasta.SetFont(, "Calibri")
 MarkyCopyPasta.SetFont("Bold s13")
 MarkyCopyPasta.Add("Text", "w300 Center", "Welcome to MarkyCopyPasta")
@@ -77,8 +77,7 @@ WelcomeMessage() {
 		(1) Open the Excel file with your marks and place the Excel cell cursor at the top of the column of Student IDs (on the first student's ID).`r`n
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). Do not touch the keyboard while the script runs.`r`n`r`n
-		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program.`r
-		This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.1.
+		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.2.
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
@@ -291,8 +290,8 @@ PasteColumnInChrome(Marks, option) {
 		}
 	}
 
-	Sleep 12000
-	MsgBox "Finished copying marks from Excel to CLiC! Please wait for the CLiC page to finish 'spinning.' Remember to check marks entered and click 'Save' once confirmed.`r`n`r`nIf you have entered zero marks, when you save or switch columns, you may have to click 'Ok' multiple times. This is normal.`r`n`r`nFor Exam Marks Entry Page, with a large number of students, copying may fail the first time. Please attempt marks copying a second time without refreshing the page. This usually solves the problem.",, "iconi"
+	Sleep 10000
+	MsgBox "Finished copying marks from Excel to CLiC! CLIC may take some time to register entered marks - wait until you see the entered marks appear in the boxes. Remember to check marks entered and click 'Save' once confirmed.`r`n`r`n**IMPORTANT** If you have entered zero marks, you need to perform an additional manual step in CLIC. Click on the input boxes with zero marks and press tab to move to the next box (or just place your cursor on the first box and press tab through all the marks). This helps to trigger the multiple zero marks dialog warning when you click save later. If this is not done, your entered marks turn back to zero on save. When you save or switch columns, you may have to click 'Ok' multiple times. This is normal.`r`n`r`nFor Exam Marks Entry Page, with a large number of students, copying may fail the first time. Please attempt marks copying a second time without refreshing the page. This usually solves the problem.",, "iconi"
 }
 
 GetStudentIDExcel() {
