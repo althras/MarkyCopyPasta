@@ -20,6 +20,7 @@ MenuHandler(ItemName, ItemPos, MyMenu) {
 ^]:: CopyExcelColumnToChrome("CWSub")
 ^\:: CopyExcelColumnToChrome("FinalOBE")
 ^;:: CheckStudentIDOrder()
+!q:: ExitApp()
 
 ; Test settings
 ; !w:: MsgBox "Student ID lists do not match! Mismatch found at position number " 1, "Mismatch", "iconx"
@@ -30,7 +31,7 @@ MenuHandler(ItemName, ItemPos, MyMenu) {
 Esc::ExitApp
 
 ; ########## SETTING UP GUI ##########
-MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.2")
+MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.3")
 MarkyCopyPasta.SetFont(, "Calibri")
 MarkyCopyPasta.SetFont("Bold s13")
 MarkyCopyPasta.Add("Text", "w300 Center", "Welcome to MarkyCopyPasta")
@@ -72,12 +73,12 @@ WelcomeMessage() {
 		Ensure there is nothing in the cell below the last mark. Students with no marks should be given a zero in Excel. For Exam Marks Entry and OBE Exam Mark Entry(w/Breakup), copy the special grades (W, R, U, I) from CLiC marks entry page into the cell for the student's mark.`r`n
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Click on the component required, and place your cursor inside the box for the first student's mark.`r`n
 		(3) Press Ctrl+[ for CW/Exam Marks Entry, Press Ctrl+] for CW Marks Sub Component Entry Page or Press Ctrl+\ for OBE Exam Marks Entry page. (You can also click the buttons in the program.) Do not touch the keyboard while the script runs.`r`n
-		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CLiC respectively. If you experience errors, you can try again without refreshing the page. This program does not click the save or submit buttons. You should be safe from errors, but remember to save your work.`r`n`r`n
+		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CLiC respectively. If you experience errors, you can try again without refreshing the page. This program does not click the save or submit buttons. You should be safe from errors, but remember to check and save your work.`r`n`r`n
 		This program can also check if the order of Student IDs in Excel and CLiC matches:`r`n
 		(1) Open the Excel file with your marks and place the Excel cell cursor at the top of the column of Student IDs (on the first student's ID).`r`n
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). (You can also click the buttons in the program.) Do not touch the keyboard while the script runs.`r`n`r`n
-		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.2.
+		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.3.
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
@@ -238,39 +239,23 @@ PasteColumnInChrome(Marks, option) {
 
 	if(option!="FinalOBE") {
 		For index, Mark in Marks {
-			if (index == 1) and (Mark == 0) {
-				Send "{Tab}"
-				if Marks[2] == 0 {
-					Send "{Tab}"
-					if Marks[3] == 0 {
-						Send "{Tab}"
-						if Marks[4] ==0 {
-							MsgBox "Detected that your first four marks are ZEROES (0). When there are more than three ZEROES (O) at the top of your marks table, please enter them manually and start your cursor in Excel and CLiC from the first non-zero mark.",, "iconx"
-							Exit
-						}
-						Send Marks[4]
-						Send "+{Tab}"
-					}
-					Send Marks[3]
-					Send "+{Tab}"
-				}
-				Send Marks[2]
-				Send "+{Tab}"
+			if IsNumber(Mark) {
+				Send "^a"
 				Send Mark
 				Send "{Tab}"
 			}
-			else {
-				if IsNumber(Mark) {
-					Send Mark
-					Send "{Tab}"
-				}
-
-				; Account for weird CLiC tabindex behavior jumping to page buttons with certain marks input fields
-				if (index == 261) and (option=="Others") and ( WinActive("Course Work Marks - Google Chrome ahk_exe chrome.exe") or WinActive("CW Marks Entry - Google Chrome ahk_exe chrome.exe") )
-					Send "{Tab 2}"
-				else if (index == 191) and (option=="CWSub")
-					Send "{Tab 4}"
+			if IsNumber(Mark) and (Mark ==0) {
+				Sleep 750
+				Send "{Space}"
+				Sleep 1500
 			}
+			Sleep 750
+
+			; Account for weird CLiC tabindex behavior jumping to page buttons with certain marks input fields
+			if (index == 261) and (option=="Others") and ( WinActive("Course Work Marks - Google Chrome ahk_exe chrome.exe") or WinActive("CW Marks Entry - Google Chrome ahk_exe chrome.exe") )
+				Send "{Tab 2}"
+			else if (index == 191) and (option=="CWSub")
+				Send "{Tab 4}"
 		}
 	}
 	else if(option=="FinalOBE") {
@@ -290,8 +275,8 @@ PasteColumnInChrome(Marks, option) {
 		}
 	}
 
-	Sleep 10000
-	MsgBox "Finished copying marks from Excel to CLiC! CLIC may take some time to register entered marks - wait until you see the entered marks appear in the boxes. Remember to check marks entered and click 'Save' once confirmed.`r`n`r`n**IMPORTANT** If you have entered zero marks, you need to perform an additional manual step in CLIC. Click on the input boxes with zero marks and press tab to move to the next box (or just place your cursor on the first box and press tab through all the marks). This helps to trigger the multiple zero marks dialog warning when you click save later. If this is not done, your entered marks turn back to zero on save. When you save or switch columns, you may have to click 'Ok' multiple times. This is normal.`r`n`r`nFor Exam Marks Entry Page, with a large number of students, copying may fail the first time. Please attempt marks copying a second time without refreshing the page. This usually solves the problem.",, "iconi"
+	Sleep 2000
+	MsgBox "Finished copying marks from Excel to CLiC! Remember to check marks entered and click 'Save' once confirmed.",, "iconi"
 }
 
 GetStudentIDExcel() {
@@ -326,7 +311,7 @@ GetStudentIDExcel() {
 	StudentIDs.pop
 
 	for StudentID in StudentIDs
-		if !IsNumber(StudentID)
+		if StrLen(StudentID) < 10
 			return false
 
 	return StudentIDs
@@ -354,10 +339,11 @@ GetStudentIDChrome() {
 	StudentIDs := []
 
 	for index, datum in Data {
-		if StrLen(datum) == 10 && IsInteger(datum) && datum > 1000000000
+		if StrLen(datum) == 10 && IsInteger(SubStr(datum, 1, 3))
 			StudentIDs.push(datum)
 	}
 
+	; MsgBox StrJoin(", ", StudentIDs)
 	return StudentIDs
 }
 
@@ -480,19 +466,6 @@ SwitchToChromeWindow() {
 	return true
 }
 
-StrJoin(sep, params) {
-	for param in params
-		str .= param . sep
-	return SubStr(str, 1, -StrLen(sep))
-}
-
-Join2D( strArray2D ) {
-  s := ""
-  for i,array in strArray2D
-    s .= ", [" . StrJoin(", ", array) . "]"
-  return substr(s, 3)
-}
-
 WaitNoAltKey() {
 	Loop {
 		if GetKeyState("LAlt", "P")
@@ -505,4 +478,17 @@ WaitNoAltKey() {
 			Continue
 		else Break
 	}
+}
+
+StrJoin(sep, params) {
+	for param in params
+		str .= param . sep
+	return SubStr(str, 1, -StrLen(sep))
+}
+
+Join2D( strArray2D ) {
+  s := ""
+  for i,array in strArray2D
+    s .= ", [" . StrJoin(", ", array) . "]"
+  return substr(s, 3)
 }
