@@ -20,4 +20,4 @@ This program can also check if the order of Student IDs in Excel and CLiC matche
 2. Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)
 3. Press Ctrl+; (semi-colon). (You can also click the buttons in the program.) Do not touch the keyboard while the script runs.
 
-While this script is running, a white & blue 'S' icon will be in your system tray. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.3
+While this script is running, a white & blue 'S' icon will be in your system tray. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.4
