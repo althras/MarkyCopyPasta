@@ -31,7 +31,7 @@ MenuHandler(ItemName, ItemPos, MyMenu) {
 Esc::ExitApp
 
 ; ########## SETTING UP GUI ##########
-MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.3")
+MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.4")
 MarkyCopyPasta.SetFont(, "Calibri")
 MarkyCopyPasta.SetFont("Bold s13")
 MarkyCopyPasta.Add("Text", "w300 Center", "Welcome to MarkyCopyPasta")
@@ -78,7 +78,7 @@ WelcomeMessage() {
 		(1) Open the Excel file with your marks and place the Excel cell cursor at the top of the column of Student IDs (on the first student's ID).`r`n
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press Ctrl+; (semi-colon). (You can also click the buttons in the program.) Do not touch the keyboard while the script runs.`r`n`r`n
-		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.3.
+		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.4.
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
@@ -259,18 +259,32 @@ PasteColumnInChrome(Marks, option) {
 		}
 	}
 	else if(option=="FinalOBE") {
-
-		if( Marks[1][1] == 0 ) {
-			MsgBox "Detected that your first student's first mark is a ZERO (0). To avoid errors, please enter this manually and start your cursor in Excel and CLiC from the first non-zero mark.",, "iconx"
-			Exit
-		}
-
+		errorDetected := false
 		For index, RowMarks in Marks {
+			if errorDetected
+				Break
+
 			for index2, Mark in RowMarks {
 				if IsNumber(Mark) {
-					Send Mark
-					Send "{Tab}"
+					Send "^a"
+					Sleep 50
+					Send "^c"
+					if IsNumber(A_Clipboard) { ; If we accidentally triggered an error message about tally being wrong, the Ctrl-A copy will return a long string
+						Send Mark
+						Send "{Tab}"
+					}
+					else if InStr(A_Clipboard, "Balance mark calculation return invalid value") {
+						MsgBox "Invalid marks detected by page. You will have to enter this student manually. (This happens only if your component totals are higher than final exam totals, or when you're reentering corrected component marks which causes the total to go higher temporarily.)",, "iconx"
+						errorDetected := True
+						Break
+					}
 				}
+				if IsNumber(Mark) and (Mark ==0) {
+					Sleep 750
+					Send "{Space}"
+					Sleep 1500
+				}
+				Sleep 750
 			}
 		}
 	}
