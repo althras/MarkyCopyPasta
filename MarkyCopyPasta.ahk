@@ -31,7 +31,7 @@ MenuHandler(ItemName, ItemPos, MyMenu) {
 Esc::ExitApp
 
 ; ########## SETTING UP GUI ##########
-MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.4")
+MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.5")
 MarkyCopyPasta.SetFont(, "Calibri")
 MarkyCopyPasta.SetFont("Bold s13")
 MarkyCopyPasta.Add("Text", "w300 Center", "Welcome to MarkyCopyPasta")
@@ -46,6 +46,10 @@ MCPCheckReady.OnEvent("Click", (*) => UpdateReadiness())
 MarkyCopyPasta.Add("Text", "xM", "")
 MCPCheckID := MarkyCopyPasta.Add("Button", "w300", "Compare Student ID Order (Ctrl + `;)")
 MCPCheckID.OnEvent("Click", (*) => CheckStudentIDOrder())
+MCPCheckTotals := MarkyCopyPasta.Add("Button", "w300", "Compare Entered Total CW Marks (BEFORE Submit)")
+MCPCheckTotals.OnEvent("Click", (*) => CheckEnteredTotals("before"))
+MCPCheckTotals := MarkyCopyPasta.Add("Button", "w300", "Compare Entered Total CW Marks (AFTER Submit)")
+MCPCheckTotals.OnEvent("Click", (*) => CheckEnteredTotals("after"))
 MarkyCopyPasta.Add("Text", "xM", "Copy Marks from Excel to:")
 MCPEntryOthers := MarkyCopyPasta.Add("Button", "w300", "CW or Exam Marks Entry pages (Ctrl + [)")
 MCPEntryOthers.OnEvent("Click", (*) => CopyExcelColumnToChrome("Others"))
@@ -72,13 +76,14 @@ WelcomeMessage() {
 		(1) Open the Excel file with your marks and place the Excel cell cursor at the top of the column of marks (on the first student's mark) you wish to copy. For Exam Marks Entry (w/Breakup), when there are more than 2 components, select the first row of student marks instead (remember to exclude the last column which auto calculates in CLiC).`r`n
 		Ensure there is nothing in the cell below the last mark. Students with no marks should be given a zero in Excel. For Exam Marks Entry and OBE Exam Mark Entry(w/Breakup), copy the special grades (W, R, U, I) from CLiC marks entry page into the cell for the student's mark.`r`n
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Click on the component required, and place your cursor inside the box for the first student's mark.`r`n
-		(3) Press Ctrl+[ for CW/Exam Marks Entry, Press Ctrl+] for CW Marks Sub Component Entry Page or Press Ctrl+\ for OBE Exam Marks Entry page. (You can also click the buttons in the program.) Do not touch the keyboard while the script runs.`r`n
+		(3) Press the shortcut key or the buttons in the GUI for the desired function depending on the marks entry page. Do not touch the keyboard while the script runs.`r`n
 		Repeat this with as many columns of marks as you need, selecting the correct start of columns in Excel and CLiC respectively. If you experience errors, you can try again without refreshing the page. This program does not click the save or submit buttons. You should be safe from errors, but remember to check and save your work.`r`n`r`n
-		This program can also check if the order of Student IDs in Excel and CLiC matches:`r`n
-		(1) Open the Excel file with your marks and place the Excel cell cursor at the top of the column of Student IDs (on the first student's ID).`r`n
+		This program can also check between Excel and CLiC if the order of Student IDs or the Total Coursework Marks entered matches between the two programs:`r`n
+		(1) Open the Excel file with your marks and place the Excel cell cursor at the top of the column of Student IDs/Total Marks (on the first student's ID/Total Marks).`r`n
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
-		(3) Press Ctrl+; (semi-colon). (You can also click the buttons in the program.) Do not touch the keyboard while the script runs.`r`n`r`n
-		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.4.
+		(3) Press the shortcut key or the buttons in the GUI for the desired function. Do not touch the keyboard while the script runs.`r`n
+		Note - you have to save marks entered before you can see Totals in the Coursework Marks Entry page. You don't have to submit yet so you can still make corrections.`r`n`r`n
+		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.5.
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
@@ -145,6 +150,94 @@ CheckStudentIDOrder() {
 		MsgBox "Student ID lists match!", "Match!", "iconi"
 	else
 		MsgBox "Student ID lists do not match! " longer, "Mismatch", "iconx"
+}
+
+CheckEnteredTotals(when) {
+	WaitNoAltKey()
+	Marks := CopyExcelColumn("single")
+
+	if !Marks {
+		MsgBox "Failed to copy only marks/grades (numbers, R, W, U, I) from Excel.",, "iconx"
+		return false
+	}
+
+	CheckForTotalsInOrder(Marks, when)
+}
+
+CheckForTotalsInOrder(totals, when) {
+	WaitNoAltKey()
+	if !SwitchToChromeWindow()
+		Exit
+
+	if !( WinActive("Course Work Marks - Google Chrome ahk_exe chrome.exe") or WinActive("CW Marks Entry - Google Chrome ahk_exe chrome.exe") ) {
+		MsgBox "This function only works with the Coursework Marks Entry page before marks are submitted.",, "iconx"
+		return
+	}
+
+	; Make sure something new enters the clipboard
+	A_Clipboard := "xyzblah"
+	Sleep 200
+	Send "^a"
+	Sleep 100
+	Send "^c"
+	Sleep 1000
+	if A_Clipboard == "xyzblah" {
+		MsgBox "Failed to get Student IDs from page.",, "iconx"
+		Exit
+	}
+
+	Data := []
+	Data := StrSplit(A_Clipboard, "`r`n")
+	marksWithID := []
+	datarow := []
+	lastdatum := 0
+
+	if when == "before" {
+		for index, datum in Data {
+			if (StrLen(datum) == 10 && IsInteger(SubStr(datum, 1, 3))) {
+				datarow.push(datum)
+				marksWithId.push(datarow)
+				datarow := []
+			}
+			else if IsNumber(datum) && datum == lastdatum
+				datarow.push(datum)
+
+			if IsNumber(datum)
+				lastdatum := datum
+		}
+	}
+	else if when == "after" {
+		for index, datum in Data {
+			if (StrLen(datum) == 10 && IsInteger(SubStr(datum, 1, 3))) {
+				if datarow.Length > 1 {
+					datarow.push("Pad") ; pad one more data item at end to standardise checking below
+					marksWithId.push(datarow)
+				}
+				datarow := []
+				datarow.push(datum)
+			}
+			else if IsNumber(datum) && datum == lastdatum
+				datarow.push(datum)
+
+			if IsNumber(datum)
+				lastdatum := datum
+		}
+	}
+
+	; MsgBox Join2D(marksWithID)
+
+	mismatch := false
+
+	for index, datum in marksWithID {
+		if Float(totals[index]) != Float(datum[datum.Length - 1]) {
+			MsgBox "Totals do not match! Mismatch found at position number " index " where the value from Excel is " totals[index] " and the value from CLIC is " datum[datum.Length - 1], "Mismatch", "iconx"
+			mismatch := true
+			break
+		}
+	}
+
+	if !mismatch
+		MsgBox "Totals match!", "Match!", "iconi"
 }
 
 CopyExcelColumn(option) {
@@ -238,12 +331,24 @@ PasteColumnInChrome(Marks, option) {
 	}
 
 	if(option!="FinalOBE") {
-		For index, Mark in Marks {
+		possibleSkips := []
+		for index, Mark in Marks {
 			if IsNumber(Mark) {
 				Send "^a"
-				Send Mark
-				Send "{Tab}"
+				Sleep 50
+				Send "^c"
+				if IsNumber(A_Clipboard) { ; If we accidentally triggered an error message about tally being wrong, the Ctrl-A copy will return a long string
+					if index > 1 && A_Clipboard == Marks[index-1] ; If we detect
+						possibleSkips.push(index)
+					Send Mark
+					Send "{Tab}"
+				}
+				else {
+					MsgBox "Cursor no longer in input field. Check the error in CLIC. If there is no error with your data, try entering this student manually and continue from the next student (place cursor on the next student mark in Excel and in input box of next student in CLIC).",, "iconx"
+					break
+				}
 			}
+
 			if IsNumber(Mark) and (Mark ==0) {
 				Sleep 750
 				Send "{Space}"
@@ -257,12 +362,15 @@ PasteColumnInChrome(Marks, option) {
 			else if (index == 191) and (option=="CWSub")
 				Send "{Tab 4}"
 		}
+
+		if possibleSkips.Length != 0
+			MsgBox "When entering, script detected marks in the input field identical to a previous mark entered at positions " StrJoin(", ", possibleSkips) ". `r`nThis can happen when marks are being reentered or the system going back an input field due to lag, which can cause error in order of marks entered. Please check.",, "iconi"
 	}
 	else if(option=="FinalOBE") {
 		errorDetected := false
-		For index, RowMarks in Marks {
+		for index, RowMarks in Marks {
 			if errorDetected
-				Break
+				break
 
 			for index2, Mark in RowMarks {
 				if IsNumber(Mark) {
