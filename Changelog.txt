@@ -1,0 +1,69 @@
+15 October 2025
+v1.6 - "I" grades will now be entered in the Final Exam Marks Entry
+       page instead of being skipped to match the page behavior.
+
+26 July 2024
+v1.5 - Added function to check entered totals for Coursework Marks
+       Entry page.
+     - Added error detection when automatically entering marks to
+       prevent script going haywire.
+
+18 July 2024
+v1.4 - Use slower marks entry behavior for
+       Final Marks Entry (OBE /w Breakup) page.
+     - Added shortcut key description to quit button.
+
+28 June 2024
+v1.3 - Changed marks entry behavior to be slower. Workarounds with
+       marks returning to zero are no longer required - should work consistently now regardless of how many zeroes there are that
+       you are entering into the system.
+     - Since this behavior is slower, it the script does an error
+       mid-way and ends up tabbing around and pressing space in the
+       wrong places, hit the shortcut key Alt+q to immediately quit
+       the program and stop whatever it is doing.
+     - Added a video in folder to show users the new behavior.
+     - Now supports the new Student ID format
+
+28 June 2024
+v1.2 - Added instruction for workaround after CaMSys to CLIC change
+       for user to press Tab key through entered marks before saving
+       to avoid it returning to zero.
+
+5 February 2024
+v1.1 - Added GUI for ease of use.
+
+11 October 2023
+v1.0 - Bug fixes for Exam Marks Entry (w/ Breakup) pages with more
+       than two columns/components of marks to enter. Instructions on
+       how to use script when entering into this page updated.
+
+12 July 2023
+v0.3.1 - Now supports OBE Marks Entry(w/Breakup) pages in CaMSys.
+
+6 July 2023
+v0.3 - Combined keys for CW Marks and Exam Marks entry. Sub Component
+       still separate key since can't reliably detect page name (page
+       changes browser title if entered from
+       Instructor Workcenter->CW Marks Entry, but doesn't change
+       browser title if entered directly from Main Menu->CW Marks
+       Entry, which most ppl will come from). Added Alt-H for help to
+       pop-up the help screen. Added a Help/Instructions to the
+       tray's icon's right-click menu.
+     - Slowed down the script a bit so it doesn't accidentally fail
+       to copy from Excel, or copy text from CaMSys text. Slightly
+       more reliable.
+     - Confirmed that Exam Marks Entry page for large number of
+       students will fail first attempt at copying for unknown
+       reasons. If you don't refresh the page however, and try again,
+       it will work correctly without problems. Improved the message
+       to alert the user to try again.
+
+5 July 2023
+v0.2.1 - Added support for U and I grades in Final Exam Marks Entry
+         pages.
+
+4 July 2023
+v0.2 - Fixes to work correctly with Final Exam Marks Entry pages.
+
+3 April 2023
+v0.1 - Initial release
