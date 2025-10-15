@@ -22,4 +22,4 @@ This program can also check between Excel and CLiC if the order of Student IDs o
 
 Note - you have to save marks entered before you can see Totals in the Coursework Marks Entry page. You don't have to submit yet so you can still make corrections.
 
-While this script is running, a white & blue 'S' icon will be in your system tray. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.5
+While this script is running, a white & blue 'S' icon will be in your system tray. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23.
