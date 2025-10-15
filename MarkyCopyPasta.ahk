@@ -31,7 +31,7 @@ MenuHandler(ItemName, ItemPos, MyMenu) {
 Esc::ExitApp
 
 ; ########## SETTING UP GUI ##########
-MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.5")
+MarkyCopyPasta := Gui(, "MarkyCopyPasta v1.6")
 MarkyCopyPasta.SetFont(, "Calibri")
 MarkyCopyPasta.SetFont("Bold s13")
 MarkyCopyPasta.Add("Text", "w300 Center", "Welcome to MarkyCopyPasta")
@@ -83,7 +83,7 @@ WelcomeMessage() {
 		(2) Open Chrome, log into CLiC and navigate to the relevant marks entry page for your subject. Make sure the cursor is not in the input box. (If you just opened the page, you don't have to do anything. Or you can click randomly somewhere on the text in the page.)`r`n
 		(3) Press the shortcut key or the buttons in the GUI for the desired function. Do not touch the keyboard while the script runs.`r`n
 		Note - you have to save marks entered before you can see Totals in the Coursework Marks Entry page. You don't have to submit yet so you can still make corrections.`r`n`r`n
-		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.5.
+		While this script is running, a white & blue 'S' icon will be in your system tray. Shortcuts shown in buttons works from any program. This program was built by Willie Poh at Hackerspace MMU's Hackathon No. 23. Version 1.6.
 	)"
 
 	MsgBox welcomemsg, "Welcome to MarkyCopyPasta!", "iconi"
@@ -333,7 +333,7 @@ PasteColumnInChrome(Marks, option) {
 	if(option!="FinalOBE") {
 		possibleSkips := []
 		for index, Mark in Marks {
-			if IsNumber(Mark) {
+			if IsNumber(mark) or mark == "I" { ; I grades need to be entered into the Final Exam Marks Entry Screen - Tong Hau Lee 15 Oct 2025.
 				Send "^a"
 				Sleep 50
 				Send "^c"
